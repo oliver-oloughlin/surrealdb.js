@@ -450,7 +450,7 @@ export class WebSocketStrategy implements Connection {
 		params?: unknown[],
 	) {
 		if (!this.socket) throw new NoActiveSocket();
-		return await this.socket.send(method, params ?? []) as U
+		return await this.socket.send(method, params ?? []) as U;
 	}
 
 	/**
