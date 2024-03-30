@@ -445,16 +445,12 @@ export class WebSocketStrategy implements Connection {
 	 * @param method - Type of message to send.
 	 * @param params - Parameters for the message.
 	 */
-	protected send<T = unknown, U = Result<T>>(
+	protected async send<T = unknown, U = Result<T>>(
 		method: string,
 		params?: unknown[],
 	) {
-		return new Promise<U>((resolve, reject) => {
-			if (!this.socket) throw new NoActiveSocket();
-			this.socket
-				.send(method, params ?? [], (r) => resolve(r as U))
-				.catch((e) => reject(e));
-		});
+		if (!this.socket) throw new NoActiveSocket();
+		return await this.socket.send(method, params ?? []) as U
 	}
 
 	/**

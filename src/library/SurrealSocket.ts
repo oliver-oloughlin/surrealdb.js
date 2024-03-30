@@ -124,13 +124,13 @@ export class SurrealSocket {
 	async send(
 		method: string,
 		params: unknown[],
-		callback: (data: Result) => unknown,
 	) {
 		await this.ready;
-
+		const { promise, resolve } = Promise.withResolvers<Result>()
 		const id = getIncrementalID();
-		this.queue[id] = callback;
+		this.queue[id] = (data) => resolve(data)
 		this.ws?.send(JSON.stringify({ id, method, params }));
+		return promise
 	}
 
 	async listenLive(
@@ -159,15 +159,10 @@ export class SurrealSocket {
 			delete this.liveQueue[queryUuid];
 		}
 
-		await new Promise<void>((r) => {
-			this.send("kill", [queryUuid], (_) => {
-				if (queryUuid in this.unprocessedLiveResponses) {
-					delete this.unprocessedLiveResponses[queryUuid];
-				}
-
-				r();
-			});
-		});
+		await this.send("kill", [queryUuid])
+		if (queryUuid in this.unprocessedLiveResponses) {
+			delete this.unprocessedLiveResponses[queryUuid];
+		}
 	}
 
 	private async handleLiveBatch(
