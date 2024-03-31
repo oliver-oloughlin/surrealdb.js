@@ -22,4 +22,4 @@ export function surrealql(query_raw: TemplateStringsArray, ...values: unknown[])
 	return new PreparedQuery(query, bindings);
 }
 
-export { surrealql as surql, surrealql as sql };
+export { surrealql as surql };
