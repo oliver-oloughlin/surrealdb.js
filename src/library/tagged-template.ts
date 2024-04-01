@@ -1,6 +1,6 @@
 import { PreparedQuery } from "./PreparedQuery.ts";
 
-export function surrealql(query_raw: TemplateStringsArray, ...values: unknown[]) {
+export function surrealql(query_raw: string[] | string | TemplateStringsArray, ...values: unknown[]) {
 	const mapped_bindings = values.map((v, i) =>
 		[`__tagged_template_literal_binding__${i}`, v] as const
 	);
@@ -9,7 +9,7 @@ export function surrealql(query_raw: TemplateStringsArray, ...values: unknown[])
 		[k]: v,
 	}), {});
 
-	const query = query_raw
+	const query = typeof query_raw === "string" ? query_raw : query_raw
 		.flatMap((segment, i) => {
 			const variable = mapped_bindings[i]?.[0];
 			return [
